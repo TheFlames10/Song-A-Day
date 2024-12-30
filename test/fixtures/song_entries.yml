@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  date: 2024-12-29
+  song_id: MyString
+  song_name: MyString
+  artist_name: MyString
+  album_cover_url: MyString
+
+two:
+  user: two
+  date: 2024-12-29
+  song_id: MyString
+  song_name: MyString
+  artist_name: MyString
+  album_cover_url: MyString

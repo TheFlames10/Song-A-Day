@@ -1,0 +1,38 @@
+<div class="container mx-auto px-4 py-8">
+  <% if current_user %>
+    <div class="flex justify-between items-center mb-8">
+      <h1 class="text-2xl font-bold">Your Song Calendar</h1>
+      <%= button_to "Logout", logout_path, method: :delete, class: "bg-red-500 text-white px-4 py-2 rounded" %>
+    </div>
+
+    <div class="calendar-grid grid grid-cols-7 gap-4">
+      <% Date.current.all_month.each do |date| %>
+        <%= turbo_frame_tag "date_#{date}" do %>
+          <div class="calendar-day p-4 border rounded-lg">
+            <div class="date-number"><%= date.day %></div>
+            <% if entry = current_user.song_entries.find_by(date: date) %>
+              <%= image_tag entry.album_cover_url, class: "w-full h-auto" if entry.album_cover_url %>
+              <div class="song-info">
+                <p class="song-name"><%= entry.song_name %></p>
+                <p class="artist-name"><%= entry.artist_name %></p>
+              </div>
+            <% else %>
+              <%= link_to "Add Song", new_song_entry_path(date: date), 
+                  class: "btn-primary", data: { turbo_frame: "modal" } %>
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="text-center py-16">
+      <h1 class="text-3xl font-bold mb-8">Welcome to Song Calendar</h1>
+      <%= button_to "/auth/spotify", 
+          class: "bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full",
+          method: :post,
+          data: { turbo: false } do %>
+        Login with Spotify
+      <% end %>
+    </div>
+  <% end %>
+</div>
