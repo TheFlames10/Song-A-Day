@@ -1,0 +1,34 @@
+<% if local_assigns[:tracks].present? %>
+  <div class="grid-container">
+    <% tracks.each do |track| %>
+      <div class="track-item">
+        <% if track.album.images.any? %>
+          <img src="<%= track.album.images.last["url"] %>" 
+               alt="Album cover" 
+               class="album-cover">
+        <% end %>
+
+        <div class="track-info">
+          <h3 class="track-name"><%= track.name %></h3>
+          <p class="track-artists"><%= track.artists.map(&:name).join(", ") %></p>
+        </div>
+
+        <%= button_to create_song_path, 
+            params: { 
+              date: params[:date],
+              song_id: track.id,
+              song_name: track.name,
+              artist_name: track.artists.first.name,
+              album_cover_url: track.album.images.first["url"]
+            },
+            class: "select-button" do %>
+          Select
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% elsif local_assigns[:tracks] == [] %>
+  <div class="no-results">
+    No songs found matching your search
+  </div>
+<% end %>
