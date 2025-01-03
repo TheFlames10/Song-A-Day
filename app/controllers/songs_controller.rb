@@ -26,31 +26,61 @@ class SongsController < ApplicationController
 
   def create
     @date = params[:date]
-    @existing_entry = current_user.song_entries.find_by(date: @date)
-
     song_attributes = {
+      date: @date,
       song_id: params[:song_id],
       song_name: params[:song_name],
       artist_name: params[:artist_name],
-      album_cover_url: params[:album_cover_url],
-      date: @date
+      album_cover_url: params[:album_cover_url]
     }
 
-    @song_entry = current_user.song_entries.find_or_initialize_by(date: @date)
-
-    # Debugging
-    Rails.logger.debug "Existing Entry: #{@existing_entry.inspect}"
-    Rails.logger.debug "Song Attributes: #{song_attributes.inspect}"
+    @existing_entry = current_user.song_entries.find_by(date: @date)
     
-    if @song_entry.update(song_attributes)
-      redirect_to root_path, notice: 'Song updated successfully!'
-    else
-      redirect_to new_song_path(date: @date), 
-        alert: "Failed to update song: #{@song_entry.errors.full_messages.join(', ')}"
+    ActiveRecord::Base.transaction do
+      if @existing_entry
+        # Remove old song from playlist
+        remove_song_from_playlist(@existing_entry.song_id) if @existing_entry.song_id != song_attributes[:song_id]
+        
+        if @existing_entry.update(song_attributes)
+          # Add new song to playlist
+          add_song_to_playlist(song_attributes[:song_id])
+          redirect_to root_path, notice: 'Song updated successfully!'
+        else
+          redirect_to new_song_path(date: @date), 
+            alert: "Failed to update song: #{@existing_entry.errors.full_messages.join(', ')}"
+        end
+      else
+        @song_entry = current_user.song_entries.build(song_attributes)
+        if @song_entry.save
+          # Add new song to playlist
+          add_song_to_playlist(song_attributes[:song_id])
+          redirect_to root_path, notice: 'Song added successfully!'
+        else
+          redirect_to new_song_path(date: @date), 
+            alert: "Failed to add song: #{@song_entry.errors.full_messages.join(', ')}"
+        end
+      end
     end
+  rescue => e
+    Rails.logger.error "Playlist operation failed: #{e.message}"
+    redirect_to new_song_path(date: @date), alert: 'Failed to update playlist'
   end
 
   private
+
+  def add_song_to_playlist(song_id)
+    return unless current_user.calendar_playlist
+    
+    track = RSpotify::Track.find(song_id)
+    current_user.calendar_playlist.add_tracks!([track])
+  end
+
+  def remove_song_from_playlist(song_id)
+    return unless current_user.calendar_playlist
+    
+    track = RSpotify::Track.find(song_id)
+    current_user.calendar_playlist.remove_tracks!([track])
+  end
 
   def song_entry_params
     params.permit(:date, :song_id, :song_name, :artist_name, :album_cover_url)

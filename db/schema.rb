@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_30_003451) do
+ActiveRecord::Schema[8.0].define(version: 2025_01_03_215426) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -34,6 +34,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_30_003451) do
     t.string "spotify_refresh_token"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "playlist_id"
   end
 
   add_foreign_key "song_entries", "users"
