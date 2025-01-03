@@ -23,8 +23,8 @@
         <% end %>
       <% end %>
       
-      <div class="calendar-day <%= 'has-song' if @song_entries&.find_by(date: date) %>">
-        <% if entry = @song_entries&.find_by(date: date) %>
+      <div class="calendar-day <%= 'has-song' if @song_entries[date] %>">
+        <% if entry = @song_entries[date] %>
           <span class="day-number"><%= date.day %></span>
           <%= image_tag entry.album_cover_url, class: "song-cover" if entry.album_cover_url %>
           <div class="song-info">
@@ -40,7 +40,7 @@
     <% end %>
   </div>
 
-  <% current_day_entry = @song_entries&.find_by(date: Date.current) %>
+  <% current_day_entry = @song_entries[Date.current] %>
   <%= link_to new_song_path(date: Date.current), class: "add-song-button" do %>
     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
       <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
