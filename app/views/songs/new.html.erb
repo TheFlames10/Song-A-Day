@@ -1,0 +1,28 @@
+<div class="container">
+  <div class="form-container">
+    <div class="header">
+      <h1 class="title">
+        Add Song for <%= @date.try(:strftime, "%B %d, %Y") || "Today" %>
+      </h1>
+      <p class="subtitle">Search for a song to add to your calendar</p>
+    </div>
+
+    <%= form_with url: search_songs_path, method: :get, 
+        data: { controller: "search", turbo_frame: "search_results" },
+        class: "search-form" do |f| %>
+      <div class="input-group">
+        <%= f.text_field :query, 
+            placeholder: "Search for a song...",
+            class: "search-input",
+            data: { action: "input->search#submit" } %>
+      </div>
+      <%= f.hidden_field :date, value: @date %>
+    <% end %>
+
+    <%= turbo_frame_tag "search_results" do %>
+      <div class="no-search-results">
+        Search for a song to see results
+      </div>
+    <% end %>
+  </div>
+</div>
