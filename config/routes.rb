@@ -12,5 +12,9 @@ Rails.application.routes.draw do
   get '/songs/search', to: 'songs#search', as: :search_songs
   post '/songs/create', to: 'songs#create', as: :create_song
   
-  resources :song_entries, except: [:index, :show]
+  resources :song_entries, only: [:edit, :update, :destroy] do
+    collection do
+      get 'search'
+    end
+  end
 end
